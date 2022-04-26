@@ -79,14 +79,17 @@ def get_params(opt, size):
     return {'crop_pos': (x, y), 'flip': flip}
 
 
-def get_transform(opt, params=None, grayscale=False, method=Image.BICUBIC, convert=True):
+def get_transform(opt, ratio, params=None, grayscale=False, method=Image.BICUBIC, convert=True):
     transform_list = []
     if grayscale:
         transform_list.append(transforms.Grayscale(1))
     if 'fixsize' in opt.preprocess:
         transform_list.append(transforms.Resize(params["size"], method))
     if 'resize' in opt.preprocess:
-        osize = [opt.load_size, opt.load_size]
+        # osize = [opt.load_size, opt.load_size]
+        osize = [int(ratio * opt.load_size), opt.load_size] 
+        # transforms.resize([height, width])
+
         if "gta2cityscapes" in opt.dataroot:
             osize[0] = opt.load_size // 2
         transform_list.append(transforms.Resize(osize, method))
