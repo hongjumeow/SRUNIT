@@ -83,8 +83,8 @@ Some notes:
 With the task `Label-to-Image` from Cityscapes as an example, the training script is
 
 ```Python
-python train.py --dataroot=$DATA_FOLDER --preprocess=crop --n_epochs=200 --n_epochs_decay=200 \
-    --reg_layers=0,1,2,3,4 --reg_noise=0.001 --reg=0.001 --init_epochs=100 --name=$MODEL_NAME 
+python train.py --dataroot=$DATA_FOLDER --name=$MODEL_NAME --preprocess=resize --load_size=600 \
+    --n_epochs=200 --n_epochs_decay=200
 ```
 
 The path `$DATA_FOLDER` should be structured such that `$DATA_FOLDER/trainA` and `$DATA_FOLDER/trainB` contain images from the source and the target domain, respectively.
@@ -97,7 +97,7 @@ Notice that this implementation (as adapted from `CUT`) currently does not suppo
 The evaluation script is
 
 ```Python
-python test.py --dataroot=$DATA_FOLDER --name=$MODEL_NAME --epoch=latest --preprocess=none \
+python test.py --dataroot=$DATA_FOLDER --name=$MODEL_NAME --epoch=latest --preprocess=resize \
     --phase=val --output_path=$OUTPUT_PATH
 ```
 
