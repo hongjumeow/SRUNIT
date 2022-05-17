@@ -230,7 +230,10 @@ class SRUNITModel(BaseModel):
         total_reg_loss = 0.0
         for f_q, f_k, noise_mag, samples in zip(feat_q_pool, feat_k_pool, self.noise_magnitude, sample_ids):
             noise_mag = (noise_mag.flatten(1, 3)[:, samples]).flatten(0, 1) # to support batch_size > 1 per gpu.
-            loss = euc_dis(f_q, f_k) / noise_mag
+            noise_mag_temp = noise_mag.view(len(self.gpu_ids), -1)[0]
+
+            # loss = euc_dis(f_q, f_k) / noise_mag
+            loss = euc_dis(f_q, f_k) / noise_map_temp
             total_reg_loss += loss.mean()
         return total_reg_loss / len(self.nce_layers) # actually len(self.nce_layers) == 1 here.
 
