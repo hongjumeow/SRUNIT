@@ -29,8 +29,9 @@ if __name__ == '__main__':
     print(output_path)
     print('The number of training images = %d' % dataset_size)
 
-    # visualizer = Visualizer(opt)
-    # opt.visualizer = visualizer
+    if opt.enable_visdom :
+        visualizer = Visualizer(opt)
+        opt.visualizer = visualizer
 
     total_iters = 0                # the total number of training iterations
     optimize_time = 0.1
@@ -40,6 +41,8 @@ if __name__ == '__main__':
         epoch_start_time = time.time()  # timer for entire epoch
         iter_data_time = time.time()    # timer for data loading per iteration
         epoch_iter = 0                  # the number of training iterations in current epoch, reset to 0 every epoch
+        if opt.enable_visdom :
+            visualizer.reset()
         # visualizer.reset()
 
         dataset.set_epoch(epoch)
@@ -67,15 +70,18 @@ if __name__ == '__main__':
             if total_iters % opt.display_freq == 0:
                 save_result = total_iters % opt.update_html_freq == 0
                 model.compute_visuals()
-                # visualizer.display_current_results(model.get_current_visuals(), epoch, save_result)
+                if opt.enable_visdom :
+                    visualizer.display_current_results(model.get_current_visuals(), epoch, save_result)
 
             if total_iters % opt.print_freq == 0:    # print training losses and save logging information to the disk
                 losses = model.get_current_losses()
-                # visualizer.plot_current_losses(epoch, epoch_iter, losses, optimize_time, t_data)
-                # visualizer.plot_current_losses(epoch, float(epoch_iter) / dataset_size, losses)
+                if opt.enable_visdom :
+                    visualizer.plot_current_losses(epoch, epoch_iter, losses, optimize_time, t_data)
+                    visualizer.plot_current_losses(epoch, float(epoch_iter) / dataset_size, losses)
                 print_current_losses(epoch, epoch_iter, losses, optimize_time, t_data, output_path)
-                # if opt.display_id is None or opt.display_id > 0:
-                    # visualizer.plot_current_losses(epoch, float(epoch_iter) / dataset_size, losses)
+                if opt.enable_visdom :
+                    if opt.display_id is None or opt.display_id > 0:
+                        visualizer.plot_current_losses(epoch, float(epoch_iter) / dataset_size, losses)
 
             if total_iters % opt.save_latest_freq == 0:   # cache our latest model every <save_latest_freq> iterations
                 print('saving the latest model (epoch %d, total_iters %d)' % (epoch, total_iters))

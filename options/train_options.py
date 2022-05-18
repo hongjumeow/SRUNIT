@@ -18,6 +18,7 @@ class TrainOptions(BaseOptions):
         parser.add_argument('--display_port', type=int, default=8097, help='visdom port of the web display')
         parser.add_argument('--update_html_freq', type=int, default=1000, help='frequency of saving training results to html')
         # parser.add_argument('--print_freq', type=int, default=100, help='frequency of showing training results on console')
+        parser.add_argument('--enable_visdom', type='store_true', help='if specified, enable visualizer: visdom')
         parser.add_argument('--no_html', action='store_true', help='do not save intermediate training results to [opt.checkpoints_dir]/[opt.name]/web/')
       
         # network saving and loading parameters
