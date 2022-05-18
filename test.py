@@ -32,7 +32,7 @@ from data import create_dataset
 from models import create_model
 from PIL import Image
 import numpy as np
-from tqdm import tqdm
+from tqdm import tqdm # library to show progress
 
 
 if __name__ == '__main__':
