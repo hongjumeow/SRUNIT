@@ -72,7 +72,7 @@ if __name__ == '__main__':
             real_img = visuals['real_A'].cpu().numpy()[0]
             real_img = ((np.transpose(real_img, [1, 2, 0]) + 1) * 127.5).astype(np.uint8)
             
-            list_imgs = [ real_imgs, generated_img ]
+            list_imgs = [ real_img, generated_img ]
             imgs_comb = []
             if(opt.save_img_mode == 'vertical'):
                 imgs_comb = np.vstack(list_imgs)
