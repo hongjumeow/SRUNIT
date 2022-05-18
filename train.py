@@ -43,7 +43,6 @@ if __name__ == '__main__':
         epoch_iter = 0                  # the number of training iterations in current epoch, reset to 0 every epoch
         if opt.enable_visdom :
             visualizer.reset()
-        # visualizer.reset()
 
         dataset.set_epoch(epoch)
         for i, data in enumerate(dataset):  # inner loop within one epoch
@@ -75,11 +74,10 @@ if __name__ == '__main__':
 
             if total_iters % opt.print_freq == 0:    # print training losses and save logging information to the disk
                 losses = model.get_current_losses()
+                print_current_losses(epoch, epoch_iter, losses, optimize_time, t_data, output_path)
                 if opt.enable_visdom :
                     visualizer.plot_current_losses(epoch, epoch_iter, losses, optimize_time, t_data)
                     visualizer.plot_current_losses(epoch, float(epoch_iter) / dataset_size, losses)
-                print_current_losses(epoch, epoch_iter, losses, optimize_time, t_data, output_path)
-                if opt.enable_visdom :
                     if opt.display_id is None or opt.display_id > 0:
                         visualizer.plot_current_losses(epoch, float(epoch_iter) / dataset_size, losses)
 
