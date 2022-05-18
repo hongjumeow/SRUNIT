@@ -63,6 +63,14 @@ if __name__ == '__main__':
         img_path = model.get_image_paths()     # get image paths
         p = img_path[0].split('/')[-1]
 
-        img = visuals['fake_B'].cpu().numpy()[0]
-        img = ((np.transpose(img, [1, 2, 0]) + 1) * 127.5).astype(np.uint8)
-        Image.fromarray(img).save(os.path.join(base_path, p))
+        # save imgs in vertical (real, fake)
+
+        real_img = visuals['real_A'].cpu().numpy()[0]
+        real_img = ((np.transpose(real_img, [1, 2, 0]) + 1) * 127.5).astype(np.uint8)
+
+        generated_img = visuals['fake_B'].cpu().numpy()[0]
+        generated_img = ((np.transpose(generated_img, [1, 2, 0]) + 1) * 127.5).astype(np.uint8)
+        
+        list_imgs = [ real_imgs, generated_img ]
+        imgs_comb = np.vstack(list_imgs)
+        Image.fromarray(imgs_comb).save(os.path.join(base_path, p))
