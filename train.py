@@ -5,7 +5,7 @@ from data import create_dataset
 from models import create_model
 import os
 from util.visualizer import Visualizer
-
+from util.parallel import DataParallel
 
 def print_current_losses(epoch, iters, losses, t_comp, t_data, path):
     message = '(epoch: %d, iters: %d, time: %.3f, data: %.3f) ' % (epoch, iters, t_comp, t_data)
@@ -25,6 +25,9 @@ if __name__ == '__main__':
     dataset_size = len(dataset)    # get the number of images in the dataset.
 
     model = create_model(opt)      # create a model given opt.model and other options
+    model = DataParallel(model)
+    model.cuda()
+
     output_path = os.path.join(model.save_dir, 'train_log.txt')
     print(output_path)
     print('The number of training images = %d' % dataset_size)

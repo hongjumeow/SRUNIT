@@ -6,6 +6,7 @@ from .patchnce import PatchNCELoss
 import util.util as util
 from torch.autograd import grad
 from torch import autograd
+from util.parallel import DataParallelCriterion
 
 
 class SRUNITModel(BaseModel):
@@ -96,6 +97,8 @@ class SRUNITModel(BaseModel):
 
         # define loss functions
         self.criterionGAN = networks.GANLoss(opt.gan_mode).to(self.device)
+        self.criterionGAN = DataParallelCriterion(self.criterionGAN)
+
         self.criterionNCE = []
         for nce_layer in self.nce_layers:
             self.criterionNCE.append(PatchNCELoss(opt).to(self.device))
@@ -233,7 +236,7 @@ class SRUNITModel(BaseModel):
             noise_mag_temp = noise_mag.view(len(self.gpu_ids), -1)[0]
 
             # loss = euc_dis(f_q, f_k) / noise_mag
-            loss = euc_dis(f_q, f_k) / noise_map_temp
+            loss = euc_dis(f_q, f_k) / noise_mag_temp
             total_reg_loss += loss.mean()
         return total_reg_loss / len(self.nce_layers) # actually len(self.nce_layers) == 1 here.
 
