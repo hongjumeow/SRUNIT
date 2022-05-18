@@ -15,6 +15,7 @@ class TestOptions(BaseOptions):
         parser.add_argument('--num_test', type=int, default=1000, help='how many test images to run')
         parser.add_argument('--output_path', type=str, default='', help='output path to store the inferece results.')
         parser.add_argument('--gan_mode', type=str, default='lsgan', help='the type of GAN objective. [vanilla| lsgan | wgangp]. vanilla GAN loss is the cross-entropy objective used in the original GAN paper.')
+        parser.add_argument('--save_img_mode', type=str, default='vertical', help='mode of saving img. [alone | vertical | horizontal].')
 
         # To avoid cropping, the load_size should be the same as crop_size
         parser.set_defaults(load_size=parser.get_default('crop_size'))
