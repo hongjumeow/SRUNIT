@@ -13,7 +13,7 @@ See our template dataset class 'template_dataset.py' for more details.
 import importlib
 import torch.utils.data
 from data.base_dataset import BaseDataset
-from torch.utils.data.distributed import DistributedSampler
+# from torch.utils.data.distributed import DistributedSampler
 
 
 def find_dataset_using_name(dataset_name):
@@ -73,7 +73,7 @@ class CustomDatasetDataLoader():
         dataset_class = find_dataset_using_name(opt.dataset_mode)
         self.dataset = dataset_class(opt)
 
-        data_sampler = DistributedSampler(self.dataset)
+        # data_sampler = DistributedSampler(self.dataset)
         
         print("dataset [%s] was created" % type(self.dataset).__name__)
         self.dataloader = torch.utils.data.DataLoader(
@@ -82,7 +82,7 @@ class CustomDatasetDataLoader():
             shuffle=not opt.serial_batches,
             num_workers=int(opt.num_threads),
             drop_last=True if opt.isTrain else False,
-            sampler=data_sampler
+            # sampler=data_sampler
         )
 
     def set_epoch(self, epoch):

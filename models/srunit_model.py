@@ -6,7 +6,7 @@ from .patchnce import PatchNCELoss
 import util.util as util
 from torch.autograd import grad
 from torch import autograd
-from util.parallel import DataParallelCriterion
+# from util.parallel import DataParallelCriterion
 
 
 class SRUNITModel(BaseModel):
@@ -97,7 +97,7 @@ class SRUNITModel(BaseModel):
 
         # define loss functions
         self.criterionGAN = networks.GANLoss(opt.gan_mode).to(self.device)
-        self.criterionGAN = DataParallelCriterion(self.criterionGAN)
+        # self.criterionGAN = DataParallelCriterion(self.criterionGAN)
 
         self.criterionNCE = []
         for nce_layer in self.nce_layers:
