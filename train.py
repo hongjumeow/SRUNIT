@@ -80,7 +80,6 @@ if __name__ == '__main__':
                 losses = model.get_current_losses()
                 print_current_losses(epoch, epoch_iter, losses, optimize_time, t_data, output_path)
                 if opt.enable_visdom :
-                    visualizer.plot_current_losses(epoch, epoch_iter, losses, optimize_time, t_data)
                     visualizer.plot_current_losses(epoch, float(epoch_iter) / dataset_size, losses)
                     if opt.display_id is None or opt.display_id > 0:
                         visualizer.plot_current_losses(epoch, float(epoch_iter) / dataset_size, losses)
