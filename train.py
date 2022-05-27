@@ -4,6 +4,7 @@ from options.train_options import TrainOptions
 from data import create_dataset
 from models import create_model
 import os
+os.environ['KMP_DUPLICATE_LIB_OK'] = 'True'
 from util.visualizer import Visualizer
 # from util.parallel import DataParallelModel
 
