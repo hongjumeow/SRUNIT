@@ -73,7 +73,7 @@ class BaseOptions():
         # Semantic Robustness Regularization (hyper-parameters for SRUNIT)
         parser.add_argument('--reg_type', type=str, default='v2', help='version 1 or version 2 for semantic robustness (SR) regularization')
         parser.add_argument('--reg', type=float, default=0.001, help='coefficient for the SR regularization loss term')
-        parser.add_argument('--reg_noise', type=float, default=0.001, help='Gaussian noise used in the semantic robustness loss')
+        parser.add_argument('--reg_noise', type=float, default=0.003, help='Gaussian noise used in the semantic robustness loss')
         parser.add_argument('--inact_epochs', type=int, default=100, help='regularization inactivated for the first couples of epochs')
 
         self.initialized = True
