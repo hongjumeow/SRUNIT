@@ -1,4 +1,6 @@
 import os.path
+
+from matplotlib import pyplot as plt
 from data.base_dataset import BaseDataset, get_transform
 from data.image_folder import make_dataset
 from PIL import Image
@@ -6,6 +8,7 @@ import random
 import util.util as util
 import pickle
 import numpy as np
+from torchvision import transforms
 
 
 class UnalignedDataset(BaseDataset):
@@ -69,6 +72,19 @@ class UnalignedDataset(BaseDataset):
         transform = get_transform(modified_opt, ratio)
         A = transform(A_img)
         B = transform(B_img)
+
+        # A_tr = transform(A_img)
+        # B_tr = transform(B_img)
+
+        # # normalize A & B w/ its mean and std
+        # mean_A, std_A = A_tr.mean([1, 2]), A_tr.std([1, 2])
+        # mean_B, std_B = B_tr.mean([1, 2]), B_tr.std([1, 2]) 
+        # # why [1,2]? 열 제거 at first, 깊이 제거 at second??
+        # A = transforms.Normalize(mean_A, std_A)(A_tr)
+        # B = transforms.Normalize(mean_B, std_B)(B_tr)
+
+        # plt.imshow(transforms.ToPILImage()(A), interpolation='bicubic')
+        # plt.show()
 
         return {'A': A, 'B': B, 'A_paths': A_path, 'B_paths': B_path}
 

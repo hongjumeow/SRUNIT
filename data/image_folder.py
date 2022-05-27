@@ -20,19 +20,25 @@ IMG_EXTENSIONS = [
 def is_image_file(filename):
     return any(filename.endswith(extension) for extension in IMG_EXTENSIONS)
 
+def walk_dirs_and_append(dir):
+    images = []
+    for root, dirs, fnames in sorted(os.walk(dir, followlinks=True)):
+        # for dir_name in dirs: # WHY DOUBLE ADD??
+        #     images.extend(walk_dirs_and_append(os.path.join(root, dir_name)))
+        for fname in fnames:
+            if is_image_file(fname):
+                path = os.path.join(root, fname)
+                images.append(path)
+    return images
 
 def make_dataset(dir, max_dataset_size=float("inf")):
     images = []
     assert os.path.isdir(dir) or os.path.islink(dir), '%s is not a valid directory' % dir
 
-    for root, _, fnames in sorted(os.walk(dir, followlinks=True)):
-        for fname in fnames:
-            if is_image_file(fname):
-                path = os.path.join(root, fname)
-                images.append(path)
+# walk thru all directories in selected file
+    images.extend(walk_dirs_and_append(dir))
     return images[:min(max_dataset_size, len(images))]
-
-
+    
 def default_loader(path):
     return Image.open(path).convert('RGB')
 

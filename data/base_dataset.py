@@ -127,10 +127,13 @@ def get_transform(opt, ratio, params=None, grayscale=False, method=Image.BICUBIC
         elif 'flip' in params:
             transform_list.append(transforms.Lambda(lambda img: __flip(img, params['flip'])))
 
-    if convert:
+    # why are there Normalizing step? 
+    # makes input img noisy T.T
+
+    if convert: # to convert to tensor
         transform_list += [transforms.ToTensor()]
         if grayscale:
-            transform_list += [transforms.Normalize((0.5,), (0.5,))]
+            transform_list += [transforms.Normalize((0.5,), (0.5,))] # Normlize() can only take tensor of image
         else:
             transform_list += [transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))]
     return transforms.Compose(transform_list)
