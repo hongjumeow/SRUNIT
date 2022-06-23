@@ -55,7 +55,8 @@ if __name__ == '__main__':
             model.setup(opt)               # regular setup: load and print networks; create schedulers
             model.parallelize()
             if opt.eval:
-                model.eval()
+                # model.eval()
+                model.validation()
         if i == opt.num_test: break  # only apply our model to opt.num_test images.
         model.set_input(data)  # unpack data from data loader
         model.test()           # run inference

@@ -1,8 +1,13 @@
 import os
+from numpy import isin
 import torch
 from collections import OrderedDict
 from abc import ABC, abstractmethod
 from . import networks
+
+from ignite.engine import Engine
+from ignite.metrics import InceptionScore
+import ignite.distributed as idist
 
 
 class BaseModel(ABC):
@@ -115,6 +120,19 @@ class BaseModel(ABC):
             if isinstance(name, str):
                 net = getattr(self, 'net' + name)
                 net.eval()
+
+    def validation(self):
+        is_metric = InceptionScore(device=idist.device(), output_transform=lambda x: x[0])
+        for name in self.model_names:
+            if isinstance(name, str):
+                net = getattr(self, 'net' + name)
+                evaluator = Engine(net.eval)
+                is_metric.attach(evaluator, "is")
+                
+                evaluator.run()
+                metrics = evaluator.state.metrics
+                is_score = metrics["is"]
+                print(f"**********      IS: {is_score}      ***********")
 
     def test(self):
         """Forward function used in test time.
