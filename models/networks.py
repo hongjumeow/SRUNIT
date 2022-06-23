@@ -944,6 +944,7 @@ class ResnetGenerator(nn.Module):
         else:
             use_bias = norm_layer == nn.InstanceNorm2d
 
+        # ResnetEncoder
         model = [nn.ReflectionPad2d(3),
                  nn.Conv2d(input_nc, ngf, kernel_size=7, padding=0, bias=use_bias),
                  norm_layer(ngf),
@@ -967,6 +968,7 @@ class ResnetGenerator(nn.Module):
 
             model += [ResnetBlock(ngf * mult, padding_type=padding_type, norm_layer=norm_layer, use_dropout=use_dropout, use_bias=use_bias)]
 
+        # ResnetDecoder
         for i in range(n_downsampling):  # add upsampling layers
             mult = 2 ** (n_downsampling - i)
             if no_antialias_up:
@@ -1004,7 +1006,7 @@ class ResnetGenerator(nn.Module):
                     fake = layer(fake)
             return fake
 
-        if len(noises) > 0:
+        if len(noises) > 0: # noise 를 줬다 뺐다 해보기 ! 
             assert len(noises) == len(feats) == len(layers)
             feats_perturbed, sampled_noise_magnitude = [], []
             for noise, layer_id, feat in zip(noises, layers, feats):
