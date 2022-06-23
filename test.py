@@ -34,9 +34,6 @@ from PIL import Image
 import numpy as np
 from tqdm import tqdm # library to show progress
 
-from ignite.engine import Engine
-from ignite.metrics import InceptionScore
-import ignite.distributed as idist
 
 if __name__ == '__main__':
     opt = TestOptions().parse()  # get test options
@@ -52,24 +49,13 @@ if __name__ == '__main__':
     base_path = os.path.join(opt.output_path, f'{opt.name}:{opt.epoch}_infer_results')
     os.makedirs(base_path, exist_ok=True)
 
-    is_metric = InceptionScore(device=idist.device(), output_transform=lambda x: x[0])
-    is_values = []
-
-    evaluator = Engine(model.eval)
-    is_metric.attach(evaluator, "is")
-
     for i, data in tqdm(enumerate(dataset)): 
         if i == 0:
             model.data_dependent_initialize(data, infer_mode=True)
             model.setup(opt)               # regular setup: load and print networks; create schedulers
             model.parallelize()
             if opt.eval:
-                evaluator.run()
-                metrics = evaluator.state.metrics
-                is_score = metrics["is"]
-                is_values.append(is_score)
-                print(f"IS: {is_score:4f}")
-                # model.eval()
+                model.eval()
         if i == opt.num_test: break  # only apply our model to opt.num_test images.
         model.set_input(data)  # unpack data from data loader
         model.test()           # run inference
