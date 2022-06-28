@@ -34,6 +34,9 @@ from PIL import Image
 import numpy as np
 from tqdm import tqdm # library to show progress
 
+from ignite.engine import Engine
+from ignite.metrics import InceptionScore
+
 
 if __name__ == '__main__':
     opt = TestOptions().parse()  # get test options
@@ -49,6 +52,10 @@ if __name__ == '__main__':
     base_path = os.path.join(opt.output_path, f'{opt.name}:{opt.epoch}_infer_results')
     os.makedirs(base_path, exist_ok=True)
 
+    engine = Engine(model.eval)
+    is_metric = InceptionScore()
+    is_metric.attach(engine, 'is')
+
     for i, data in tqdm(enumerate(dataset)): 
         if i == 0:
             model.data_dependent_initialize(data, infer_mode=True)
@@ -56,7 +63,8 @@ if __name__ == '__main__':
             model.parallelize()
             if opt.eval:
                 # model.eval()
-                model.validation()
+                state = engine.run()
+                print(f"Accuracy: {state.metrics['is']}")
         if i == opt.num_test: break  # only apply our model to opt.num_test images.
         model.set_input(data)  # unpack data from data loader
         model.test()           # run inference
@@ -64,6 +72,7 @@ if __name__ == '__main__':
         img_path = model.get_image_paths()     # get image paths
         p = img_path[0].split('/')[-1]
 
+        
         # save imgs
 
         generated_img = visuals['fake_B'].cpu().numpy()[0]

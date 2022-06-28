@@ -120,19 +120,8 @@ class BaseModel(ABC):
             if isinstance(name, str):
                 net = getattr(self, 'net' + name)
                 net.eval()
-
-    def validation(self):
-        is_metric = InceptionScore(device=idist.device(), output_transform=lambda x: x[0])
-        for name in self.model_names:
-            if isinstance(name, str):
-                net = getattr(self, 'net' + name)
-                evaluator = Engine(net.eval)
-                is_metric.attach(evaluator, "is")
-                
-                evaluator.run()
-                metrics = evaluator.state.metrics
-                is_score = metrics["is"]
-                print(f"**********      IS: {is_score}      ***********")
+                return getattr(self, 'fake_B'), getattr(self, 'real_A')
+        return 
 
     def test(self):
         """Forward function used in test time.
