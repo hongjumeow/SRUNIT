@@ -1,9 +1,11 @@
 import os
+from torchvision.transforms import transforms
 from numpy import isin
 import torch
 from collections import OrderedDict
 from abc import ABC, abstractmethod
 from . import networks
+from PIL import Image
 
 from ignite.engine import Engine
 from ignite.metrics import InceptionScore
@@ -120,8 +122,6 @@ class BaseModel(ABC):
             if isinstance(name, str):
                 net = getattr(self, 'net' + name)
                 net.eval()
-                return getattr(self, 'fake_B'), getattr(self, 'real_A')
-        return 
 
     def test(self):
         """Forward function used in test time.
