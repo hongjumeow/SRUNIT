@@ -86,8 +86,7 @@ def get_transform(opt, params=None, grayscale=False, method=Image.BICUBIC, conve
     if 'fixsize' in opt.preprocess:
         transform_list.append(transforms.Resize(params["size"], method))
     if 'resize' in opt.preprocess:
-        # osize = [opt.load_size, opt.load_size]
-        osize = [int(opt.ratio * opt.load_size), opt.load_size] 
+        osize = [opt.load_size, opt.load_size]
         # transforms.resize([height, width])
 
         if "gta2cityscapes" in opt.dataroot:
@@ -119,7 +118,7 @@ def get_transform(opt, params=None, grayscale=False, method=Image.BICUBIC, conve
         transform_list.append(transforms.Lambda(lambda img: __trim(img, opt.crop_size)))
 
     # if opt.preprocess == 'none':
-    transform_list.append(transforms.Lambda(lambda img: __make_power_2(img, base=4, method=method)))
+    # transform_list.append(transforms.Lambda(lambda img: __make_power_2(img, base=4, method=method)))
 
     if not opt.no_flip:
         if params is None or 'flip' not in params:
