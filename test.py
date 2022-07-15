@@ -33,7 +33,48 @@ from models import create_model
 from PIL import Image
 import numpy as np
 from tqdm import tqdm # library to show progress
+from scipy.linalg import sqrtm
+from torchvision import transforms
 
+def compute_fid(image1, image2):
+    model = torch.hub.load('pytorch/vision:v0.10.0', 'inception_v3', pretrained=True)
+    model.eval()
+
+    img1 = Image.open(image1)
+    img2 = Image.open(image2)
+    preprocess= transforms.Compose([
+        transforms.Resize(299),
+        transforms.CenterCrop(299),
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+    ])
+
+    input1 = preprocess(img1)
+    input2 = preprocess(img2)
+    input1_batch = input1.unsqueeze(0)
+    input2_batch = input2.unsqueeze(0)
+
+    if torch.cuda.is_available():
+        input1_batch = input1_batch.to('cuda')
+        input2_batch = input2_batch.to('cuda')
+        model.to('cuda')
+
+    with torch.no_grad():
+        act1 = model(input1_batch)
+        act2 = model(input2_batch)
+
+
+    mu1, sigma1 = act1.mean(axis=0), np.cov(act1, rowvar=False)
+    mu2, sigma2 = act2.mean(axis=0), np.cov(act2, rowvar=False)
+
+    ssdiff = np.sum((mu1 - mu2) ** 2.0)
+    covmean = sqrtm(sigma1.dot(sigma2))
+
+    if np.iscomplexobj(covmean):
+        covmean = covmean.real
+    
+    fid = ssdiff + np.trace(sigma1 + sigma2 - 2.0 * covmean)
+    return fid
 
 if __name__ == '__main__':
     opt = TestOptions().parse()  # get test options
@@ -46,7 +87,7 @@ if __name__ == '__main__':
     dataset = create_dataset(opt)  # create a dataset given opt.dataset_mode and other options
     model = create_model(opt)      # create a model given opt.model and other options
 
-    base_path = os.path.join(opt.output_path, f'{opt.name}:{opt.epoch}_infer_results')
+    base_path = os.path.join(opt.output_path, '%s:%s_infer_results' % (opt.name, opt.epoch))
     os.makedirs(base_path, exist_ok=True)
 
     for i, data in tqdm(enumerate(dataset)): 
@@ -55,7 +96,8 @@ if __name__ == '__main__':
             model.setup(opt)               # regular setup: load and print networks; create schedulers
             model.parallelize()
             if opt.eval:
-                model.eval()
+                # model.eval()
+                state = engine.run()
         if i == opt.num_test: break  # only apply our model to opt.num_test images.
         model.set_input(data)  # unpack data from data loader
         model.test()           # run inference
@@ -63,16 +105,22 @@ if __name__ == '__main__':
         img_path = model.get_image_paths()     # get image paths
         p = img_path[0].split('/')[-1]
 
+        print(model.compute_fid())
         
         # save imgs
 
         generated_img = visuals['fake_B'].cpu().numpy()[0]
         generated_img = ((np.transpose(generated_img, [1, 2, 0]) + 1) * 127.5).astype(np.uint8)
         
+        real_img = visuals['real_A'].cpu().numpy()[0]
+        real_img = ((np.transpose(real_img, [1, 2, 0]) + 1) * 127.5).astype(np.uint8)
+
+        img1 = Image.fromarray(generated_img)
+        img2 = Image.fromarray(real_img)
+        fid = compute_fid(img1, img2)
+        print(fid)
+
         if(opt.save_img_mode != 'alone'):
-            real_img = visuals['real_A'].cpu().numpy()[0]
-            real_img = ((np.transpose(real_img, [1, 2, 0]) + 1) * 127.5).astype(np.uint8)
-            
             list_imgs = [ real_img, generated_img ]
             imgs_comb = []
             if(opt.save_img_mode == 'vertical'):
